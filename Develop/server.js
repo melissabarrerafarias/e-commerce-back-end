@@ -1,4 +1,6 @@
 const express = require('express');
+const { SequelizeScopeError } = require('sequelize/types');
+const { sequelize } = require('./models/Tag');
 const routes = require('./routes');
 // import sequelize connection
 
@@ -11,6 +13,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(routes);
 
 // sync sequelize models to the database, then turn on the server
-app.listen(PORT, () => {
-  console.log(`App listening on port ${PORT}!`);
+sequelize.sync({ force: false }).then(() => {
+  app.listen(PORT, () => {
+    console.log(`App listening on port ${PORT}!`);
+  });
 });
+
