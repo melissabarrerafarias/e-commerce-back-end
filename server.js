@@ -1,8 +1,7 @@
 const express = require('express');
-const { SequelizeScopeError } = require('sequelize/types');
-const { sequelize } = require('./models/Tag');
 const routes = require('./routes');
 // import sequelize connection
+const sequelize = require('./config/connection');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
