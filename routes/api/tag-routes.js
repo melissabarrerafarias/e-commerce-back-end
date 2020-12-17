@@ -78,7 +78,22 @@ router.post('/', (req, res) => { // create a new tag
 
 // /api/tags/:id
 router.put('/:id', (req, res) => { // update a tag's name by its `id` value
-
+  Tag.update(req.body, {
+    where: {
+      id: req.params.id
+    }
+  })
+    .then(tagData => {
+      if (!tagData[0]) {
+        res.status(404).json({ message: 'No tag found with this id' });
+        return;
+      }
+      res.json(tagData);
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json(err);
+    });
 });
 
 // /api/tags/:id
