@@ -66,7 +66,14 @@ router.get('/:id', (req, res) => { // find a single tag by its `id`, be sure to 
 
 // /api/tags
 router.post('/', (req, res) => { // create a new tag
-
+  Tag.create({
+    tag_name: req.body.tag_name
+  })
+    .then(tagData => res.json(tagData))
+    .catch(err => {
+      console.log(err);
+      res.json(400).json(err);
+    })
 });
 
 // /api/tags/:id
