@@ -3,19 +3,73 @@ const { Product, Category, Tag, ProductTag } = require('../../models');
 
 // The `/api/products` endpoint
 
-// get all products
-router.get('/', (req, res) => {
-  // find all products
-  // be sure to include its associated Category and Tag data
+// /api/products
+router.get('/', (req, res) => { // find all products, be sure to include its associated Category and Tag data
+  Product.findAll({
+    attributes: [
+      'id',
+      'product_name',
+      'price',
+      'stock',
+    ],
+    include: [
+      {
+        model: Category,
+        attributes: ['category_name']
+      },
+      {
+        model: Tag,
+        attributes: ['tag_name'],
+        through: ProductTag,
+        as: 'product_info'
+      }
+    ]
+  }).then(productData => res.json(productData))
+    .catch(err => {
+      console.log(err);
+      res.status(500).json(err);
+    })
 });
 
 // get one product
-router.get('/:id', (req, res) => {
-  // find a single product by its `id`
-  // be sure to include its associated Category and Tag data
+// /api/products/:id
+router.get('/:id', (req, res) => { // find a single product by its `id`, be sure to include its associated Category and Tag data
+  Product.findOne({
+    attributes: [
+      'id',
+      'product_name',
+      'price',
+      'stock'
+    ],
+    where: {
+      id: req.params.id
+    },
+    include: [
+      {
+        model: Category,
+        attributes: ['category_name']
+      },
+      {
+        model: Tag,
+        attributes: ['tag_name'],
+        through: ProductTag,
+        as: 'product_info'
+      }
+    ]
+  }).then(productData => {
+    if (!productData) {
+      res.status(404).json({ message: 'No product found with this id' });
+      return;
+    }
+    res.json(productData);
+  }).catch(err => {
+    console.log(err);
+    res.status(500).json(err);
+  });
 });
 
 // create new product
+// /api/products
 router.post('/', (req, res) => {
   /* req.body should look like this...
     {
@@ -48,6 +102,7 @@ router.post('/', (req, res) => {
 });
 
 // update product
+// /api/product/:id
 router.put('/:id', (req, res) => {
   // update product data
   Product.update(req.body, {
@@ -89,8 +144,24 @@ router.put('/:id', (req, res) => {
     });
 });
 
-router.delete('/:id', (req, res) => {
-  // delete one product by its `id` value
+// /api/products/:id
+router.delete('/:id', (req, res) => { // delete one product by its `id` value
+  Product.destroy({
+    where: {
+      id: req.params.id
+    }
+  })
+    .then(productData => {
+      if (!productData) {
+        res.status(404).json({ message: "No product found with this id" });
+        return;
+      }
+      res.json(productData);
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json(err);
+    });
 });
 
 module.exports = router;
